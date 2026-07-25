@@ -27,51 +27,23 @@ class CategoryController extends Controller
         ]);
     }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'slug' => 'required|string|unique:categories,slug|max:255',
-    //         'description' => 'nullable|string',
-    //         'order' => 'integer|default:0',
-    //         'is_active' => 'boolean|default:true'
-    //     ]);
-
-    //     $category = Category::create($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'دسته‌بندی با موفقیت ایجاد شد',
-    //         'data' => $category
-    //     ], 201);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $category = Category::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'name' => 'sometimes|string|max:255',
-    //         'slug' => ['sometimes', 'string', 'max:255', Rule::unique('categories')->ignore($id)],
-    //         'description' => 'nullable|string',
-    //         'order' => 'integer|default:0',
-    //         'is_active' => 'boolean|default:true'
-    //     ]);
-
-    //     $category->update($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'دسته‌بندی با موفقیت بروزرسانی شد',
-    //         'data' => $category
-    //     ]);
-    // }
-
     public function store(Request $request)
     {
-        $category = new Category();
-        $category->fill($request->all());
-        $category->save();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:categories,slug|max:255',
+            'description' => 'nullable|string',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
+
+        $category = Category::create([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'description' => $validated['description'] ?? null,
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
+        ]);
 
         return response()->json([
             'success' => true,
@@ -83,9 +55,23 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
-        $category->fill($request->all());
-        $category->save();
 
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:255', Rule::unique('categories')->ignore($id)],
+            'description' => 'nullable|string',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
+
+        $category->update([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'description' => $validated['description'] ?? null,
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
+        ]);
+        
         return response()->json([
             'success' => true,
             'message' => 'دسته‌بندی با موفقیت بروزرسانی شد',

@@ -22,10 +22,9 @@ Route::prefix('v1/')->group(function () {
     // مدیریت دسته‌بندی‌ها
     Route::prefix('admin/categories')->group(function () {
         Route::get('/list', [CategoryController::class, 'index']);
-        Route::get('/list', [CategoryController::class, 'index']);
         Route::get('/list/{id}', [CategoryController::class, 'show']);
         Route::post('/store', [CategoryController::class, 'store']);
-        Route::put('/update/{id}', [CategoryController::class, 'update']);
+        Route::post('/update/{id}', [CategoryController::class, 'update']);
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
         Route::patch('/{id}/toggle-active', [CategoryController::class, 'toggleActive']);
     });
