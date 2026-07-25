@@ -22,6 +22,7 @@ Route::prefix('v1/')->group(function () {
     // مدیریت دسته‌بندی‌ها
     Route::prefix('admin/categories')->group(function () {
         Route::get('/list', [CategoryController::class, 'index']);
+        Route::get('/list', [CategoryController::class, 'index']);
         Route::get('/list/{id}', [CategoryController::class, 'show']);
         Route::post('/store', [CategoryController::class, 'store']);
         Route::put('/update/{id}', [CategoryController::class, 'update']);
@@ -37,7 +38,7 @@ Route::prefix('v1/')->group(function () {
         Route::put('/update/{id}', [QuestionController::class, 'update']);
         Route::delete('/delete/{id}', [QuestionController::class, 'destroy']);
         Route::patch('/{id}/toggle-active', [QuestionController::class, 'toggleActive']);
-        Route::get('/by-category/{categoryId}', [QuestionController::class, 'byCategory']);
+        Route::get('/list/by-category/{categoryId}', [QuestionController::class, 'byCategory']);
     });
 
     // مدیریت گزینه‌های پاسخ

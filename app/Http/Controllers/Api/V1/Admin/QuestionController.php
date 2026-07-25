@@ -24,6 +24,34 @@ class QuestionController extends Controller
         ]);
     }
 
+    // public function byCategory($categoryId)
+    // {
+    //     // بررسی وجود دسته‌بندی
+    //     $category = Category::find($categoryId);
+        
+    //     if (!$category) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'دسته‌بندی مورد نظر یافت نشد'
+    //         ], 404);
+    //     }
+
+    //     // دریافت سوالات آن دسته
+    //     $questions = Question::with(['category', 'answerOptions'])
+    //         ->where('category_id', $categoryId)
+    //         ->orderBy('order')
+    //         ->get();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => [
+    //             'category' => $category,
+    //             'questions' => $questions,
+    //             'total' => $questions->count()
+    //         ]
+    //     ]);
+    // }
+
     // نمایش یک سوال
     public function show($id)
     {
