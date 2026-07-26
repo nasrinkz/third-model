@@ -20,6 +20,7 @@ class AnswerOption extends Model
         'icon',
         'color',
         'order',
+        'is_active'
     ];
 
     protected $casts = [

@@ -31,7 +31,7 @@ return new class extends Migration
             
             // ترتیب نمایش
             $table->integer('order')->default(0);
-            
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             
             // هر نوع، فقط یک گزینه با هر مقدار می‌تواند داشته باشد

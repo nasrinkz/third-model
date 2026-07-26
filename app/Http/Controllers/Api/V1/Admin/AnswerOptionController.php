@@ -37,117 +37,94 @@ class AnswerOptionController extends Controller
         ]);
     }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'type' => 'required|string|max:255',
-    //         'value' => 'required|integer|min:1|max:5',
-    //         'label' => 'required|string|max:255',
-    //         'icon' => 'nullable|string|max:50',
-    //         'color' => 'nullable|string|max:50',
-    //         'order' => 'integer|default:0',
-    //         'is_active' => 'boolean|default:true'
-    //     ]);
-
-    //     // بررسی یکتا بودن type + value
-    //     $exists = AnswerOption::where('type', $validated['type'])
-    //         ->where('value', $validated['value'])
-    //         ->exists();
-
-    //     if ($exists) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
-    //         ], 400);
-    //     }
-
-    //     $option = AnswerOption::create($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'گزینه با موفقیت ایجاد شد',
-    //         'data' => $option
-    //     ], 201);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $option = AnswerOption::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'type' => 'sometimes|string|max:255',
-    //         'value' => 'sometimes|integer|min:1|max:5',
-    //         'label' => 'sometimes|string|max:255',
-    //         'icon' => 'nullable|string|max:50',
-    //         'color' => 'nullable|string|max:50',
-    //         'order' => 'integer|default:0',
-    //         'is_active' => 'boolean|default:true'
-    //     ]);
-
-    //     // بررسی یکتا بودن در صورت تغییر type یا value
-    //     if (isset($validated['type']) || isset($validated['value'])) {
-    //         $newType = $validated['type'] ?? $option->type;
-    //         $newValue = $validated['value'] ?? $option->value;
-            
-    //         $exists = AnswerOption::where('type', $newType)
-    //             ->where('value', $newValue)
-    //             ->where('id', '!=', $id)
-    //             ->exists();
-
-    //         if ($exists) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
-    //             ], 400);
-    //         }
-    //     }
-
-    //     $option->update($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'گزینه با موفقیت بروزرسانی شد',
-    //         'data' => $option
-    //     ]);
-    // }
-
     public function store(Request $request)
     {
-        try {
-            $option = AnswerOption::create($request->all());
+        $validated = $request->validate([
+            'type' => 'required|string|max:255',
+            'value' => 'required|integer|min:1|max:5',
+            'label' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:50',
+            'color' => 'nullable|string|max:50',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'گزینه با موفقیت ایجاد شد',
-                'data' => $option
-            ], 201);
-            
-        } catch (\Exception $e) {
+        // بررسی یکتا بودن type + value
+        $exists = AnswerOption::where('type', $validated['type'])
+            ->where('value', $validated['value'])
+            ->exists();
+
+        if ($exists) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ایجاد گزینه: ' . $e->getMessage()
-            ], 500);
+                'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
+            ], 400);
         }
+
+        $option = AnswerOption::create([
+            'type' => $validated['type'],
+            'value' => $validated['value'],
+            'label' => $validated['label'],
+            'icon' => $validated['icon'] ?? null,
+            'color' => $validated['color'] ?? null,
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'گزینه با موفقیت ایجاد شد',
+            'data' => $option
+        ], 201);
     }
 
     public function update(Request $request, $id)
     {
-        try {
-            $option = AnswerOption::findOrFail($id);
-            $option->update($request->all());
+        $option = AnswerOption::findOrFail($id);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'گزینه با موفقیت بروزرسانی شد',
-                'data' => $option
-            ]);
+        $validated = $request->validate([
+            'type' => 'required|string|max:255',
+            'value' => 'required|integer|min:1|max:5',
+            'label' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:50',
+            'color' => 'nullable|string|max:50',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
+
+        // بررسی یکتا بودن در صورت تغییر type یا value
+        if (isset($validated['type']) || isset($validated['value'])) {
+            $newType = $validated['type'] ?? $option->type;
+            $newValue = $validated['value'] ?? $option->value;
             
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'خطا در بروزرسانی گزینه: ' . $e->getMessage()
-            ], 500);
+            $exists = AnswerOption::where('type', $newType)
+                ->where('value', $newValue)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
+                ], 400);
+            }
         }
+
+        $option->update([
+            'type' => $validated['type'],
+            'value' => $validated['value'],
+            'label' => $validated['label'],
+            'icon' => $validated['icon'] ?? null,
+            'color' => $validated['color'] ?? null,
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'گزینه با موفقیت بروزرسانی شد',
+            'data' => $option
+        ]);
     }
 
     public function destroy($id)
