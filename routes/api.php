@@ -34,7 +34,7 @@ Route::prefix('v1/')->group(function () {
         Route::get('/list', [QuestionController::class, 'index']);
         Route::get('/list/{id}', [QuestionController::class, 'show']);
         Route::post('/store', [QuestionController::class, 'store']);
-        Route::put('/update/{id}', [QuestionController::class, 'update']);
+        Route::post('/update/{id}', [QuestionController::class, 'update']);
         Route::delete('/delete/{id}', [QuestionController::class, 'destroy']);
         Route::patch('/{id}/toggle-active', [QuestionController::class, 'toggleActive']);
         Route::get('/list/by-category/{categoryId}', [QuestionController::class, 'byCategory']);

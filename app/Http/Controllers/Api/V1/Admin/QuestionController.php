@@ -24,33 +24,33 @@ class QuestionController extends Controller
         ]);
     }
 
-    // public function byCategory($categoryId)
-    // {
-    //     // بررسی وجود دسته‌بندی
-    //     $category = Category::find($categoryId);
+    public function byCategory($categoryId)
+    {
+        // بررسی وجود دسته‌بندی
+        $category = Category::find($categoryId);
         
-    //     if (!$category) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'دسته‌بندی مورد نظر یافت نشد'
-    //         ], 404);
-    //     }
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'دسته‌بندی مورد نظر یافت نشد'
+            ], 404);
+        }
 
-    //     // دریافت سوالات آن دسته
-    //     $questions = Question::with(['category', 'answerOptions'])
-    //         ->where('category_id', $categoryId)
-    //         ->orderBy('order')
-    //         ->get();
+        // دریافت سوالات آن دسته
+        $questions = Question::with(['category', 'answerOptions'])
+            ->where('category_id', $categoryId)
+            ->orderBy('order')
+            ->get();
 
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => [
-    //             'category' => $category,
-    //             'questions' => $questions,
-    //             'total' => $questions->count()
-    //         ]
-    //     ]);
-    // }
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'category' => $category,
+                'questions' => $questions,
+                'total' => $questions->count()
+            ]
+        ]);
+    }
 
     // نمایش یک سوال
     public function show($id)
@@ -65,45 +65,51 @@ class QuestionController extends Controller
     // ایجاد سوال جدید
     public function store(Request $request)
     {
-        // $validated = $request->validate([
-        //     'category_id' => 'required|exists:categories,id',
-        //     'text' => 'required|string',
-        //     'answer_type' => 'required|string|in:agreement,frequency,satisfaction,importance',
-        //     'correct_answer' => 'required|integer|min:1|max:5',
-        //     'order' => 'integer|default:0',
-        //     'is_active' => 'boolean|default:true'
-        // ]);
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'text' => 'required|string',
+            'answer_type' => 'required|string|in:agreement,frequency,satisfaction,importance',
+            'correct_answer' => 'required|integer|min:1|max:5',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
 
-        // $question = Question::create($validated);
-
-        $data = $request->only([
-            'category_id',
-            'text',
-            'answer_type',
-            'correct_answer',
-            'order',
-            'is_active'
+        $question = Question::create([
+            'category_id' => $validated['category_id'],
+            'text' => $validated['text'],
+            'answer_type' => $validated['answer_type'],
+            'correct_answer' => $validated['correct_answer'],
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
         ]);
         
-        $question = Question::create($data);
-
         return response()->json([
             'success' => true,
             'message' => 'سوال با موفقیت ایجاد شد',
             'data' => $question->load(['category', 'answerOptions'])
         ], 201);
     }
-
-    // بروزرسانی سوال
+  
     public function update(Request $request, $id)
     {
         $question = Question::findOrFail($id);
-        
-        // فقط فیلدهای مشخص شده را بروزرسانی می‌کند
+
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'text' => 'required|string',
+            'answer_type' => 'required|string|in:agreement,frequency,satisfaction,importance',
+            'correct_answer' => 'required|integer|min:1|max:5',
+            'order' => 'integer|nullable',
+            'is_active' => 'boolean|nullable'
+        ]);
+
         $question->update([
-            'text' => $request->text ?? $question->text,
-            'answer_type' => $request->answer_type ?? $question->answer_type,
-            'correct_answer' => $request->correct_answer ?? $question->correct_answer,
+            'category_id' => $validated['category_id'],
+            'text' => $validated['text'],
+            'answer_type' => $validated['answer_type'],
+            'correct_answer' => $validated['correct_answer'],
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $validated['is_active'] ?? true
         ]);
 
         return response()->json([
@@ -112,27 +118,6 @@ class QuestionController extends Controller
             'data' => $question->load(['category', 'answerOptions'])
         ]);
     }
-    // public function update(Request $request, $id)
-    // {
-    //     $question = Question::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'category_id' => 'sometimes|exists:categories,id',
-    //         'text' => 'sometimes|string',
-    //         'answer_type' => 'sometimes|string|in:agreement,frequency,satisfaction,importance',
-    //         'correct_answer' => 'sometimes|integer|min:1|max:5',
-    //         'order' => 'integer|default:0',
-    //         'is_active' => 'boolean|default:true'
-    //     ]);
-
-    //     $question->update($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'سوال با موفقیت بروزرسانی شد',
-    //         'data' => $question->load(['category', 'answerOptions'])
-    //     ]);
-    // }
 
     // حذف سوال
     public function destroy($id)
@@ -160,17 +145,4 @@ class QuestionController extends Controller
         ]);
     }
 
-    // دریافت سوالات یک دسته خاص برای مدیریت
-    public function byCategory($categoryId)
-    {
-        $questions = Question::with(['category', 'answerOptions'])
-            ->where('category_id', $categoryId)
-            ->orderBy('order')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $questions
-        ]);
-    }
 }
