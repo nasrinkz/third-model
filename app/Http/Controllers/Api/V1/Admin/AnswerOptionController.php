@@ -14,7 +14,7 @@ class AnswerOptionController extends Controller
     {
         $type = $request->get('type');
         
-        $query = AnswerOption::orderBy('type')->orderBy('order');
+        $query = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')->orderBy('type')->orderBy('order');
         
         if ($type) {
             $query->where('type', $type);
@@ -30,7 +30,7 @@ class AnswerOptionController extends Controller
 
     public function show($id)
     {
-        $option = AnswerOption::findOrFail($id);
+        $option = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')->findOrFail($id);
         return response()->json([
             'success' => true,
             'data' => $option
