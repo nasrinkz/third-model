@@ -23,10 +23,13 @@ Route::prefix('v1/')->group(function () {
     Route::prefix('admin/categories')->group(function () {
         Route::get('/list', [CategoryController::class, 'index']);
         Route::get('/list/{id}', [CategoryController::class, 'show']);
+        Route::get('/{id}/questions', [CategoryController::class, 'getWithQuestions']);
         Route::post('/store', [CategoryController::class, 'store']);
         Route::post('/update/{id}', [CategoryController::class, 'update']);
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
         Route::patch('/toggle-active/{id}', [CategoryController::class, 'toggleActive']);
+        Route::post('/reorder', [CategoryController::class, 'reorder']);
+        Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
     });
 
     // مدیریت سوالات
