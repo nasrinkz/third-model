@@ -6,100 +6,92 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AnswerOption;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AnswerOptionController extends Controller
 {
     public function index(Request $request)
     {
-        $type = $request->get('type');
-        
-        $query = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')->orderBy('type')->orderBy('order');
-        
-        if ($type) {
-            $query->where('type', $type);
-        }
-        
-        $options = $query->get();
+        try {
+            $type = $request->get('type');
+            
+            $query = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')
+                ->orderBy('type')
+                ->orderBy('order');
+            
+            if ($type) {
+                $query->where('type', $type);
+            }
+            
+            $options = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $options
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $options,
+                'total' => $options->count()
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت لیست گزینه‌ها: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($id)
     {
-        $option = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')->findOrFail($id);
-        return response()->json([
-            'success' => true,
-            'data' => $option
-        ]);
+        try {
+            $option = AnswerOption::select('id', 'type', 'value', 'label', 'icon', 'color', 'order', 'is_active')
+                ->findOrFail($id);
+                
+            return response()->json([
+                'success' => true,
+                'data' => $option
+            ]);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'گزینه مورد نظر یافت نشد'
+            ], 404);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در نمایش گزینه: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'type' => 'required|string|max:255',
-            'value' => 'required|integer|min:1|max:5',
-            'label' => 'required|string|max:255',
-            'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:50',
-            'order' => 'integer|nullable',
-            'is_active' => 'boolean|nullable'
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'type' => 'required|string|max:255',
+                'value' => 'required|integer|min:1|max:5',
+                'label' => 'required|string|max:255',
+                'icon' => 'nullable|string|max:50',
+                'color' => 'nullable|string|max:50',
+                'order' => 'nullable|integer|min:0',
+                'is_active' => 'nullable|boolean'
+            ]);
 
-        // بررسی یکتا بودن type + value
-        $exists = AnswerOption::where('type', $validated['type'])
-            ->where('value', $validated['value'])
-            ->exists();
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در اعتبارسنجی داده‌ها',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
-            ], 400);
-        }
+            $validated = $validator->validated();
 
-        $option = AnswerOption::create([
-            'type' => $validated['type'],
-            'value' => $validated['value'],
-            'label' => $validated['label'],
-            'icon' => $validated['icon'] ?? null,
-            'color' => $validated['color'] ?? null,
-            'order' => $validated['order'] ?? 0,
-            'is_active' => $validated['is_active'] ?? true
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'گزینه با موفقیت ایجاد شد',
-            'data' => $option
-        ], 201);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $option = AnswerOption::findOrFail($id);
-
-        $validated = $request->validate([
-            'type' => 'required|string|max:255',
-            'value' => 'required|integer|min:1|max:5',
-            'label' => 'required|string|max:255',
-            'icon' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:50',
-            'order' => 'integer|nullable',
-            'is_active' => 'boolean|nullable'
-        ]);
-
-        // بررسی یکتا بودن در صورت تغییر type یا value
-        if (isset($validated['type']) || isset($validated['value'])) {
-            $newType = $validated['type'] ?? $option->type;
-            $newValue = $validated['value'] ?? $option->value;
-            
-            $exists = AnswerOption::where('type', $newType)
-                ->where('value', $newValue)
-                ->where('id', '!=', $id)
+            // بررسی یکتا بودن type + value
+            $exists = AnswerOption::where('type', $validated['type'])
+                ->where('value', $validated['value'])
                 ->exists();
 
             if ($exists) {
@@ -108,60 +100,235 @@ class AnswerOptionController extends Controller
                     'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
                 ], 400);
             }
-        }
 
-        $option->update([
-            'type' => $validated['type'],
-            'value' => $validated['value'],
-            'label' => $validated['label'],
-            'icon' => $validated['icon'] ?? null,
-            'color' => $validated['color'] ?? null,
-            'order' => $validated['order'] ?? 0,
-            'is_active' => $validated['is_active'] ?? true
-        ]);
-    
-        return response()->json([
-            'success' => true,
-            'message' => 'گزینه با موفقیت بروزرسانی شد',
-            'data' => $option
-        ]);
+            $option = AnswerOption::create([
+                'type' => $validated['type'],
+                'value' => $validated['value'],
+                'label' => $validated['label'],
+                'icon' => $validated['icon'] ?? null,
+                'color' => $validated['color'] ?? null,
+                'order' => $validated['order'] ?? 0,
+                'is_active' => $validated['is_active'] ?? true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'گزینه با موفقیت ایجاد شد',
+                'data' => $option
+            ], 201);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد گزینه: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $option = AnswerOption::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'type' => 'sometimes|string|max:255',
+                'value' => 'sometimes|integer|min:1|max:5',
+                'label' => 'sometimes|string|max:255',
+                'icon' => 'nullable|string|max:50',
+                'color' => 'nullable|string|max:50',
+                'order' => 'nullable|integer|min:0',
+                'is_active' => 'nullable|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در اعتبارسنجی داده‌ها',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
+
+            // بررسی یکتا بودن در صورت تغییر type یا value
+            if (isset($validated['type']) || isset($validated['value'])) {
+                $newType = $validated['type'] ?? $option->type;
+                $newValue = $validated['value'] ?? $option->value;
+                
+                $exists = AnswerOption::where('type', $newType)
+                    ->where('value', $newValue)
+                    ->where('id', '!=', $id)
+                    ->exists();
+
+                if ($exists) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'این ترکیب نوع و مقدار قبلاً ثبت شده است'
+                    ], 400);
+                }
+            }
+
+            $option->update([
+                'type' => $validated['type'] ?? $option->type,
+                'value' => $validated['value'] ?? $option->value,
+                'label' => $validated['label'] ?? $option->label,
+                'icon' => $validated['icon'] ?? $option->icon,
+                'color' => $validated['color'] ?? $option->color,
+                'order' => $validated['order'] ?? $option->order,
+                'is_active' => $validated['is_active'] ?? $option->is_active
+            ]);
+        
+            return response()->json([
+                'success' => true,
+                'message' => 'گزینه با موفقیت بروزرسانی شد',
+                'data' => $option->fresh()
+            ]);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'گزینه مورد نظر یافت نشد'
+            ], 404);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در بروزرسانی گزینه: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy($id)
     {
-        $option = AnswerOption::findOrFail($id);
-        $option->delete();
+        try {
+            $option = AnswerOption::findOrFail($id);
+            $option->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'گزینه با موفقیت حذف شد'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'گزینه با موفقیت حذف شد'
+            ]);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'گزینه مورد نظر یافت نشد'
+            ], 404);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف گزینه: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function toggleActive($id)
     {
-        $option = AnswerOption::findOrFail($id);
-        $option->is_active = !$option->is_active;
-        $option->save();
+        try {
+            $option = AnswerOption::findOrFail($id);
+            $option->is_active = !$option->is_active;
+            $option->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'وضعیت گزینه تغییر کرد',
-            'data' => $option
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => $option->is_active ? 'گزینه فعال شد' : 'گزینه غیرفعال شد',
+                'data' => $option
+            ]);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'گزینه مورد نظر یافت نشد'
+            ], 404);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در تغییر وضعیت گزینه: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    // دریافت انواع گزینه‌ها (برای select box)
     public function types()
     {
-        $types = AnswerOption::select('type')
-            ->distinct()
-            ->get()
-            ->pluck('type');
+        try {
+            $types = AnswerOption::select('type')
+                ->distinct()
+                ->get()
+                ->pluck('type')
+                ->values()
+                ->toArray();
 
-        return response()->json([
-            'success' => true,
-            'data' => $types
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $types,
+                'total' => count($types)
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت انواع گزینه‌ها: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getByType($type)
+    {
+        try {
+            $options = AnswerOption::where('type', $type)
+                ->where('is_active', true)
+                ->orderBy('order')
+                ->get();
+
+            if ($options->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هیچ گزینه‌ای برای این نوع پیدا نشد'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $options,
+                'total' => $options->count()
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت گزینه‌ها: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف گروهی گزینه‌ها بر اساس نوع
+     */
+    public function deleteByType($type)
+    {
+        try {
+            $deleted = AnswerOption::where('type', $type)->delete();
+
+            if ($deleted === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هیچ گزینه‌ای برای این نوع پیدا نشد'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$deleted} گزینه با موفقیت حذف شد",
+                'deleted_count' => $deleted
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف گزینه‌ها: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

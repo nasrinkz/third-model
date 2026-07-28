@@ -49,5 +49,7 @@ Route::prefix('v1/')->group(function () {
         Route::delete('/delete/{id}', [AnswerOptionController::class, 'destroy']);
         Route::patch('/toggle-active/{id}', [AnswerOptionController::class, 'toggleActive']);
         Route::get('/types', [AnswerOptionController::class, 'types']);
+        Route::get('/type/{type}', [AnswerOptionController::class, 'getByType']);
+        Route::delete('/type/{type}', [AnswerOptionController::class, 'deleteByType']);
     });
 });
