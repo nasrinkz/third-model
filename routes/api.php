@@ -40,6 +40,7 @@ Route::prefix('v1/')->group(function () {
         Route::post('/update/{id}', [QuestionController::class, 'update']);
         Route::delete('/delete/{id}', [QuestionController::class, 'destroy']);
         Route::patch('/toggle-active/{id}', [QuestionController::class, 'toggleActive']);
+        Route::get('/stats', [QuestionController::class, 'stats']);
         Route::get('/list/by-category/{categoryId}', [QuestionController::class, 'byCategory']);
     });
 
