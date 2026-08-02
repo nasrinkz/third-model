@@ -28,7 +28,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت لیست دسته‌بندی‌ها: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -54,7 +54,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در نمایش دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -97,7 +97,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ایجاد دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -156,7 +156,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در بروزرسانی دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -191,7 +191,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -218,7 +218,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در تغییر وضعیت دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -251,7 +251,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت اطلاعات: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -288,7 +288,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در تغییر ترتیب: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -340,7 +340,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف گروهی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }

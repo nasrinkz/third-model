@@ -3,65 +3,55 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Category, Question, AnswerOption};
-use Illuminate\Http\Request;
+use App\Models\AnswerOption;
+use App\Models\Category;
+use App\Models\Question;
+use Illuminate\Database\Eloquent\Builder;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $questions = Question::select(['id', 'text', 'category_id', 'answer_type', 'correct_answer', 'order', 'is_active'])
-        ->with('category')
-        ->with(['answerOptions' => function($query) {
-            $query->orderBy('order');
-        }])
-        ->where('is_active', true)
-        ->orderBy('order')
-        ->get();
+        return $this->questionsResponse(Question::whereHas('category', fn ($query) => $query->where('is_active', true)));
+    }
 
-        foreach($questions as $question) {
-            $question->category_name = $question->category->name ?? 'بدون دسته';
-        }
+    public function byCategory(string $category)
+    {
+        $categoryModel = Category::where('slug', $category)->where('is_active', true)->firstOrFail();
 
-        $questions->makeHidden(['category']);
+        return $this->questionsResponse(Question::where('category_id', $categoryModel->id));
+    }
 
-        $formattedQuestions = $questions->map(function ($question) {
-            return [
+    public function answerTypes()
+    {
+        return response()->json(['types' => AnswerOption::distinct()->pluck('type')]);
+    }
+
+    private function questionsResponse(Builder $query)
+    {
+        $questions = $query->select(['id', 'text', 'category_id', 'answer_type', 'order'])
+            ->with('category:id,name')
+            ->with(['answerOptions' => fn ($options) => $options->where('is_active', true)->orderBy('order')])
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        return response()->json([
+            'questions' => $questions->map(fn ($question) => [
                 'id' => $question->id,
                 'text' => $question->text,
                 'category_id' => $question->category_id,
-                'category_name' => $question->category_name,
+                'category_name' => $question->category?->name,
                 'answer_type' => $question->answer_type,
-                'correct_answer' => $question->correct_answer,
                 'order' => $question->order,
-                'is_active' => $question->is_active,
-                'options' => $question->answerOptions->map(function ($option) {
-                    return [
-                        'value' => $option->value,
-                        'label' => $option->label,
-                        'icon' => $option->icon,
-                        'color' => $option->color,
-                    ];
-                })
-            ];
-        });
-
-        return response()->json([
-            'questions' => $formattedQuestions,
+                'options' => $question->answerOptions->map(fn ($option) => [
+                    'value' => $option->value,
+                    'label' => $option->label,
+                    'icon' => $option->icon,
+                    'color' => $option->color,
+                ]),
+            ]),
             'total_questions' => $questions->count(),
-        ]);
-    }
-
-    // دریافت لیست انواع پاسخ‌های موجود
-    public function answerTypes()
-    {
-        $types = AnswerOption::select('type')
-            ->distinct()
-            ->get()
-            ->pluck('type');
-
-        return response()->json([
-            'types' => $types
         ]);
     }
 }

@@ -98,7 +98,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت لیست سوالات: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -149,7 +149,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت سوالات دسته‌بندی: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -196,7 +196,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت سوالات: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -220,7 +220,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در نمایش سوال: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -265,7 +265,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ایجاد سوال: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -325,7 +325,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در بروزرسانی سوال: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -350,7 +350,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف سوال: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -377,7 +377,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در تغییر وضعیت سوال: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -417,7 +417,7 @@ class QuestionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت آمار: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }

@@ -36,7 +36,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت لیست گزینه‌ها: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -61,7 +61,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در نمایش گزینه: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -120,7 +120,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ایجاد گزینه: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -193,7 +193,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در بروزرسانی گزینه: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -218,7 +218,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف گزینه: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -245,7 +245,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در تغییر وضعیت گزینه: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -269,7 +269,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت انواع گزینه‌ها: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -298,7 +298,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در دریافت گزینه‌ها: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
@@ -327,7 +327,7 @@ class AnswerOptionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف گزینه‌ها: ' . $e->getMessage()
+                'message' => 'An unexpected server error occurred.'
             ], 500);
         }
     }
