@@ -25,6 +25,11 @@ class AnswerOptionController extends Controller
                 $query->where('type', $type);
             }
             
+             // جستجو در متن
+            if ($request->has('search') && $request->search) {
+                $query->where('value', 'like', "%{$request->search}%");
+            }
+
             $options = $query->get();
 
             return response()->json([
