@@ -27,7 +27,7 @@ class AnswerOptionController extends Controller
             
              // جستجو در متن
             if ($request->has('search') && $request->search) {
-                $query->where('value', 'like', "%{$request->search}%");
+                $query->where('label', 'like', "%{$request->search}%");
             }
 
             $options = $query->get();
