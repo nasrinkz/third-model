@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\Admin\{AnswerOptionController, CategoryController, QuestionController};
+use App\Http\Controllers\Api\V1\Admin\{MainController, AnswerOptionController, CategoryController, QuestionController};
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -13,7 +13,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        
+        //آمار
+        Route::get('/stats', [MainController::class, 'stats']);
+
         Route::prefix('categories')->group(function () {
             Route::get('/list', [CategoryController::class, 'index']);
             Route::get('/list/{id}', [CategoryController::class, 'show']);
